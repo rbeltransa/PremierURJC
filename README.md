@@ -24,3 +24,5 @@ Un usuario no puede gestionar un equipo que no es el suyo, para evitar que esto 
   - Entrenador: director de un equipo, el cual es el encargado de inscribir a su equipo en una determinada liga y gestionar su plantilla
   - Torneo: campeonato de la liga en el cual se van a inscribir los equipos.
   - Palmarés: ranking de campeones del torneo.
+## Diagrama UML
+![ClassDiagram](ClassDiagram.png)
