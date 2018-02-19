@@ -41,4 +41,7 @@ La página se divide en dos partes:
   ![p3](p3.png)
   - Parte privada: área de gestión del entrenador (registro de entrenadores y equipos).
   ![p4](p4.png)
-  
+  Si el entrenador hace loggin de manera correcta se mostrará por pantalla:
+  ![p5](p5.png)
+  Si, por el contrario, el loggin fallase se mostraría:
+  ![p6](p6.png)
