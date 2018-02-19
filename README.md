@@ -26,3 +26,5 @@ Un usuario no puede gestionar un equipo que no es el suyo, para evitar que esto 
   - Palmarés: ranking de campeones del torneo.
 ## Diagrama UML
 ![ClassDiagram](ClassDiagram.png)
+## Diagrama de navegación
+![diagrama_navegacion](diagrama_navegacion.png)
