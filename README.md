@@ -30,3 +30,6 @@ Un usuario no puede gestionar un equipo que no es el suyo, para evitar que esto 
 ![diagrama_navegacion](diagrama_navegacion.png)
 ## Esquema Entidad/Relación
 ![Entidad_Relacion](Entidad_Relacion.png)
+## Capturas de la aplicación
+En primer lugar se muestra la página de inicio de la aplicación:
+![P1](P1.png)
