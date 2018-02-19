@@ -37,6 +37,8 @@ La página se divide en dos partes:
 
   - Parte pública: realizar consultas (nombre de jugador, plantilla, edad, nacionalidad, palmarés y torneo).
   ![p2](p2.png)
-  
-  -Parte privada: área de gestión del entrenador (registro de entrenadores y equipos).
+  La siguiente imagen muestra una consulta realizada con éxito:
+  ![p3](p3.png)
+  - Parte privada: área de gestión del entrenador (registro de entrenadores y equipos).
   ![p4](p4.png)
+  
