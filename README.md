@@ -33,3 +33,10 @@ Un usuario no puede gestionar un equipo que no es el suyo, para evitar que esto 
 ## Capturas de la aplicación
 En primer lugar se muestra la página de inicio de la aplicación:
 ![p1](p1.png)
+La página se divide en dos partes:
+
+  - Parte pública: realizar consultas (nombre de jugador, plantilla, edad, nacionalidad, palmarés y torneo).
+  ![p2](p2.png)
+  
+  -Parte privada: área de gestión del entrenador (registro de entrenadores y equipos).
+  ![p4](p4.png)
