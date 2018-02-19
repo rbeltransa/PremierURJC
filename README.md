@@ -28,3 +28,5 @@ Un usuario no puede gestionar un equipo que no es el suyo, para evitar que esto 
 ![ClassDiagram](ClassDiagram.png)
 ## Diagrama de navegación
 ![diagrama_navegacion](diagrama_navegacion.png)
+## Esquema Entidad/Relación
+![Entidad Relacion](Entidad Relacion.jpg)
