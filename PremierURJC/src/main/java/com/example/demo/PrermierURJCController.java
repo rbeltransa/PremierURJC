@@ -1,11 +1,15 @@
 package com.example.demo;
 
+import java.io.File;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -151,33 +155,45 @@ public class PrermierURJCController {
 	public String areaPrivada() {
 		return "areaprivada";
 	}
+	
+	//Acceso a formulario de registro
+	@RequestMapping("/registrousuario")
+	public String registroUsuario() {
+		return "registrousuario";
+	}
 
 	// Login Entrenador.
 	@PostMapping("/login")
 	public String loginEntrenador(Model model, @RequestParam String user, @RequestParam String password,
-			HttpSession sesion) {
+			HttpSession sesion, HttpServletRequest request) {
 
 		// Comprobamos si existe o no un Entrenador registrado con ese "user" y "password".
 		Entrenador entrenador = entrenadorRepository.findByUserAndPassword(user, password);
 
 		// Si existe devuelve la información.
 		if (entrenador != null) {
-			sesion.setAttribute("user", user);
-			sesion.setAttribute("password", password);
-			userCompartida = user;
-			passwordCompartida = password;
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			String usuario = authentication.getName();
+			sesion = request.getSession();
+			sesion.setAttribute("user", usuario);
+			model.addAttribute("userCompartida", userCompartida);
 
-			return "loggincorrecto";
+			return "areagestionentrenador";
 		} else {
 			// Si no existe notifica el error al usuario.
-			return "errorentrenadornoexiste";
+			return "areaprivada";
 		}
 	}
 
 	// Área de gestión del entrenador donde podra gestionar su equipo y consultar su
 	// información.
 	@RequestMapping("/areagestionentrenador")
-	public String areaGestionEntrenador() {
+	public String areaGestionEntrenador(Model model, HttpSession sesion, HttpServletRequest request) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String user = authentication.getName();
+		sesion = request.getSession();
+		sesion.setAttribute("user", user);
+		model.addAttribute("userCompartida", userCompartida);
 		return "areagestionentrenador";
 	}
 
@@ -314,7 +330,8 @@ public class PrermierURJCController {
 
 		// Si no existe lo crea (registra).
 		if (existe == null) {
-			Entrenador entrenador = new Entrenador(nombreEntrenador, equipoEntrenador, user, password);
+			String rol = "ROLE_USER";
+			Entrenador entrenador = new Entrenador(nombreEntrenador, equipoEntrenador, user, password, rol);
 			entrenadorRepository.save(entrenador);
 			return "entrenadorregistrado";
 		} else {
@@ -325,19 +342,23 @@ public class PrermierURJCController {
 
 	// Información Entrenador.
 	@GetMapping("/informacionentrenador/user/password")
-	public String verEntrenador(Model model, HttpSession sesion) {
-
-		// Cargamos los datos de la sesión del entrenador.
-		String user = (String) sesion.getAttribute("user");
-		String password = (String) sesion.getAttribute("password");
-
-		model.addAttribute("user", user);
-		model.addAttribute("password", user);
-
+	public String verEntrenador(Model model, HttpSession sesion, HttpServletRequest request) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String user = authentication.getName();
+		sesion = request.getSession();
+		sesion.setAttribute("user", user);
 		model.addAttribute("userCompartida", userCompartida);
-		model.addAttribute("passwordCompartida", passwordCompartida);
+		// Cargamos los datos de la sesión del entrenador.
+		//String user = (String) sesion.getAttribute("user");
+		//String password = (String) sesion.getAttribute("password");
 
-		Entrenador entrenador = entrenadorRepository.findByUserAndPassword(user, password);
+		//model.addAttribute("user", user);
+		//model.addAttribute("password", user);
+
+		//model.addAttribute("userCompartida", userCompartida);
+		//model.addAttribute("passwordCompartida", passwordCompartida);
+
+		Entrenador entrenador = entrenadorRepository.findByUser(user);
 
 		model.addAttribute("Entrenador", entrenador);
 
@@ -346,19 +367,24 @@ public class PrermierURJCController {
 
 	// Inscribir Equipo.
 	@GetMapping("/registrarequipo/user/password")
-	public String registrarequipoEntrenador(Model model, HttpSession sesion) {
-
-		// Cargamos los datos de la sesión del Entrenador.
-		String user = (String) sesion.getAttribute("user");
-		String password = (String) sesion.getAttribute("password");
-
-		model.addAttribute("user", user);
-		model.addAttribute("password", user);
-
+	public String registrarequipoEntrenador(Model model, HttpSession sesion, HttpServletRequest request) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String user = authentication.getName();
+		sesion = request.getSession();
+		sesion.setAttribute("user", user);
 		model.addAttribute("userCompartida", userCompartida);
-		model.addAttribute("passwordCompartida", passwordCompartida);
+		
+		// Cargamos los datos de la sesión del Entrenador.
+		//String user = (String) sesion.getAttribute("user");
+		//String password = (String) sesion.getAttribute("password");
 
-		Entrenador entrenador = entrenadorRepository.findByUserAndPassword(user, password);
+		//model.addAttribute("user", user);
+		//model.addAttribute("password", user);
+
+		//model.addAttribute("userCompartida", userCompartida);
+		//model.addAttribute("passwordCompartida", passwordCompartida);
+
+		Entrenador entrenador = entrenadorRepository.findByUser(user);
 
 		model.addAttribute("entrenador", entrenador);
 
@@ -372,11 +398,43 @@ public class PrermierURJCController {
 
 		// Comprobamos si existe o no un Equipo registrado con ese "nombreEquipo".
 		Equipo existe = equipoRepository.findByNombreEquipo(nombreEquipo);
-
+		
+		// Comprobamos si existe o no un Torneo registrado con ese nombre de "liga"
+		Torneo torneo = torneoRepository.findByNombreLiga(liga);
+		
 		// Si no existe, continuamos con el registro del equipo.
 		if (existe == null) {
+			// Si no existe el torneo lo creamos y lo guardamos
+			if(torneo == null) {
+				torneo = new Torneo(liga,20);
+				torneoRepository.save(torneo);
+			}
+			// Creamos el equipo y le asignamos el torneo en el que participa
 			Equipo equipo = new Equipo(nombreEquipo, liga, nacionalidadEquipo, numTorneoGanados);
+			equipo.setTorneo(torneo);
 			equipoRepository.save(equipo);
+			
+			File dirFichas = null;
+			try{
+				dirFichas = new File ("fichas");
+				if(!dirFichas.exists()) {
+					dirFichas.mkdir();
+				}
+			}catch (Exception e){
+				e.printStackTrace();
+			}finally{
+			}
+			
+			File dirEquipo = null;
+			try{
+				dirEquipo = new File("fichas/"+nombreEquipo);
+				if(!dirEquipo.exists()) {
+					dirEquipo.mkdir();
+				}
+			}catch (Exception e){
+				e.printStackTrace();
+			}finally{
+			}
 
 			return "equiporegistrado";
 		} else {
@@ -387,19 +445,24 @@ public class PrermierURJCController {
 
 	// Inscribir Jugador.
 	@GetMapping("/registrarjugador/user/password")
-	public String registrarJugadorEntrenador(Model model, HttpSession sesion) {
-
-		// Cargamos los datos de la sesión del Entrenador.
-		String user = (String) sesion.getAttribute("user");
-		String password = (String) sesion.getAttribute("password");
-
-		model.addAttribute("user", user);
-		model.addAttribute("password", user);
-
+	public String registrarJugadorEntrenador(Model model, HttpServletRequest request, HttpSession sesion) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String user = authentication.getName();
+		sesion = request.getSession();
+		sesion.setAttribute("user", user);
 		model.addAttribute("userCompartida", userCompartida);
-		model.addAttribute("passwordCompartida", passwordCompartida);
+		
+		// Cargamos los datos de la sesión del Entrenador.
+		//String user = (String) sesion.getAttribute("user");
+		//String password = (String) sesion.getAttribute("password");
 
-		Entrenador entrenador = entrenadorRepository.findByUserAndPassword(user, password);
+		//model.addAttribute("user", user);
+		//model.addAttribute("password", user);
+
+		//model.addAttribute("userCompartida", userCompartida);
+		//model.addAttribute("passwordCompartida", passwordCompartida);
+
+		Entrenador entrenador = entrenadorRepository.findByUser(user);
 
 		model.addAttribute("entrenador", entrenador);
 
@@ -420,6 +483,10 @@ public class PrermierURJCController {
 			Jugador jugador = new Jugador(nombreJugador, equipoJugador, posicion, edad, nacionalidadJugador,
 					valorMercado);
 			jugadorRepository.save(jugador);
+			
+			ClienteSocket socket = new ClienteSocket();
+			socket.enviarInfoJugador(nombreJugador, equipoJugador, posicion, edad, nacionalidadJugador, valorMercado);
+			socket.recibirInfoJugador(nombreJugador, equipoJugador);
 
 			return "jugadorregistrado";
 		} else {
