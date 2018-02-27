@@ -100,7 +100,15 @@ public class Entrenador {
 	public void setJugadores(List<Jugador> jugadores) {
 		this.jugadores = jugadores;
 	}
-
+	
+	public List<String> getRoles(){
+		return roles;
+	}
+	
+	public void setRoles(List<String> roles){
+		this.roles = roles;
+	}
+	
 	@Override
 	public String toString() {
 		return "Entrenador [id=" + id + ", nombreEntrenador=" + nombreEntrenador + ", equipoEntrenador=" + equipoEntrenador + ", user="
